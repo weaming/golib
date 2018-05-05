@@ -14,16 +14,20 @@ func Exist(path string) bool {
 }
 
 func CreateDirIfNotExist(dir string, force bool) error {
+	mode := os.FileMode(0777)
 	fi, err := os.Stat(dir)
 	if os.IsNotExist(err) {
 		// prepare dir
-		if err := os.MkdirAll(dir, 0777); err != nil {
+		if err := os.MkdirAll(dir, mode); err != nil {
 			return err
 		}
 	} else {
 		// if is normal file
 		if force && fi.Mode().IsRegular() {
 			if err := os.Remove(dir); err != nil {
+				return err
+			}
+			if err := os.MkdirAll(dir, mode); err != nil {
 				return err
 			}
 		}

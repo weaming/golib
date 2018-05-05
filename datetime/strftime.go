@@ -1,4 +1,4 @@
-package utils
+package datetime
 
 // copy from https://github.com/jehiah/go-strftime
 
