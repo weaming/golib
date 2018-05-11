@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -10,6 +11,32 @@ func Exist(path string) bool {
 		return false
 	} else {
 		return true
+	}
+}
+
+func IsFile(path string) bool {
+	return fileMode(path) == "file"
+}
+
+func IsDir(path string) bool {
+	return fileMode(path) == "directory"
+}
+
+func fileMode(path string) string {
+	fi, err := os.Stat(path)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		// do directory stuff
+		return "directory"
+	case mode.IsRegular():
+		// do file stuff
+		return "file"
+	default:
+		return ""
 	}
 }
 
