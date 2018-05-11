@@ -32,7 +32,7 @@ func NewDir(path string) *Dir {
 		files, _ := ioutil.ReadDir(path)
 		for _, fi := range files {
 			name := fi.Name()
-			absPath, err := filepath.Abs(fi.Name())
+			absPath, err := filepath.Abs(filepath.Join(path, fi.Name()))
 			if err != nil {
 				panic(err)
 			}
