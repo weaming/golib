@@ -9,14 +9,14 @@ import (
 	"os/exec"
 )
 
-func RunCommandMust(command string, args ...string) string {
+func RunCommandMust(command string, args ...string) (string, string) {
 	stdout, stderr, err := RunCommand(command, args...)
 
 	if err != nil {
 		errText := fmt.Sprintf("error: %v\nstdout: %v\nstderr: %v\n", err, stdout, stderr)
 		log.Fatal(errors.New(errText))
 	}
-	return stdout
+	return stdout, stderr
 }
 
 func RunCommand(command string, args ...string) (string, string, error) {
