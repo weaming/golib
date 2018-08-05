@@ -12,6 +12,7 @@ func main() {
 	proxy := flag.String("proxy", "http://localhost:8123", "proxy url")
 	code := flag.Int("code", 200, "expected response status code")
 	timeout := flag.Int("timeout", 3, "timeout in seconds")
+	flag.Parse()
 
 	if proxylib.IsValidProxy(*url, *proxy, *code, *timeout) {
 		os.Exit(0)
