@@ -8,7 +8,7 @@ import (
 	"github.com/weaming/golib/debug"
 )
 
-func IsValidProxy(checkURL, proxy string, expectCode int) bool {
+func IsValidProxy(checkURL, proxy string, expectCode, timeout int) bool {
 	proxyURL, err := url.Parse(proxy)
 	if err != nil {
 		debug.Debug(err)
@@ -19,7 +19,7 @@ func IsValidProxy(checkURL, proxy string, expectCode int) bool {
 		Proxy: http.ProxyURL(proxyURL),
 	}
 	myClient := &http.Client{Transport: &transport}
-	myClient.Timeout = 10 * time.Second
+	myClient.Timeout = time.Duration(timeout) * time.Second
 	resp, err := myClient.Get(checkURL)
 	if err != nil {
 		debug.Debug(err)
