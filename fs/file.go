@@ -2,6 +2,8 @@ package fs
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -72,4 +74,16 @@ func OpenFile(path string) (*os.File, error) {
 		}
 	}
 	return os.Create(path)
+}
+
+func ReadFile(path string) []byte {
+	if IsFile(path) {
+		dat, err := ioutil.ReadFile(path)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		return dat
+	}
+	return nil
 }
