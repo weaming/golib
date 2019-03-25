@@ -13,9 +13,6 @@ type Node struct {
 	ContainerType string
 }
 
-type JSONObj map[string]interface{}
-type JSONArr []interface{}
-
 func NewRootNode(value interface{}) Node {
 	return Node{
 		Path:          []string{},
