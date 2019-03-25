@@ -10,7 +10,7 @@ import (
 func NewConfig(filepath string, config *interface{}) *interface{} {
 	file, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		log.Fatalln("Read config file error.")
+		log.Fatalf("Read config file error: %v\n", filepath)
 	}
 	err = json.Unmarshal(file, config)
 	if err != nil {
