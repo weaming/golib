@@ -93,7 +93,7 @@ func (t *Topic) Start() {
 						t.Pub <- x
 						log.Println(err.Error())
 					} else {
-						log.Println("sent message on topic \"%v\", message: %v", t.Topic, x)
+						log.Printf("sent message on topic \"%v\", message: %v", t.Topic, x)
 					}
 				}(fn)
 			}
