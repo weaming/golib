@@ -9,11 +9,8 @@ import (
 )
 
 func Exist(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	} else {
-		return true
-	}
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
 
 func IsFile(path string) bool {
@@ -86,4 +83,10 @@ func ReadFile(path string) []byte {
 		return dat
 	}
 	return nil
+}
+
+func WriteFile(path string, content []byte) {
+	if e := ioutil.WriteFile(path, content, 0644); e != nil {
+		log.Fatal(e)
+	}
 }
