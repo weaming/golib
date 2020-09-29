@@ -7,7 +7,7 @@ import (
 )
 
 func JSON(w http.ResponseWriter, val interface{}, code ...int) {
-	b, err := serilize.JSON(val)
+	b, err := serilize.JSON(val, 0)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

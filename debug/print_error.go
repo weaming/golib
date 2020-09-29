@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func Debug(e interface{}) {
+func Debug(v interface{}) {
 	if os.Getenv("DEBUG") != "" {
-		log.Println(e)
+		log.Println(v)
 	}
 }

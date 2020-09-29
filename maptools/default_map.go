@@ -1,4 +1,4 @@
-package default_map
+package maptools
 
 import (
 	"sort"

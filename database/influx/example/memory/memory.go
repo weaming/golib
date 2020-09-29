@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	influx "github.com/influxdata/influxdb/client/v2"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/mem"
-	"github.com/weaming/golib/database/influx"
+	libinflux "github.com/weaming/golib/database/influx"
 )
 
 const (
@@ -15,7 +16,7 @@ const (
 )
 
 func main() {
-	c := influx.New(influx.Config{
+	c := libinflux.New(influx.HTTPConfig{
 		Addr: dbhost,
 	})
 	c.CreateDB(dbname)
@@ -35,12 +36,12 @@ func main() {
 			n++
 
 			v, _ := mem.VirtualMemory()
-			bp.Add(influx.Point{
+			bp.Add(libinflux.Point{
 				Name: "memory",
-				Tags: influx.Tags{
+				Tags: libinflux.Tags{
 					"os": hi.OS,
 				},
-				Fields: influx.Fields{
+				Fields: libinflux.Fields{
 					"free":    float64(v.Free),
 					"percent": float64(v.UsedPercent),
 				},

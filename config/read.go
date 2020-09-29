@@ -14,7 +14,7 @@ func NewConfig(filepath string, config *interface{}) *interface{} {
 	}
 	err = json.Unmarshal(file, config)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return config

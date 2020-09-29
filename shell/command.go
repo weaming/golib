@@ -31,7 +31,7 @@ func RunCommand(command string, args ...string) (string, string, error) {
 	return stdout.String(), stderr.String(), err
 }
 
-func RunCommandWithWd(dir, command string, args ...string) (string, string, error) {
+func RunCommandWithWorkdir(dir, command string, args ...string) (string, string, error) {
 	wd, err := os.Getwd()
 	fatalError(err)
 
@@ -45,7 +45,7 @@ func RunCommandWithWd(dir, command string, args ...string) (string, string, erro
 	return stdout, stderr, err
 }
 
-func ShellCommand(command string) string {
+func ShellCommand(command string) (string, string) {
 	split := safeSplit(command)
 	l := len(split)
 	if l > 1 {
