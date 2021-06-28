@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func Exist(path string) bool {
@@ -39,26 +40,22 @@ func fileMode(path string) string {
 	}
 }
 
-func CreateDirIfNotExist(dir string, force bool) error {
+func CreateDirIfNotExist(dir string) error {
 	mode := os.FileMode(0777)
-	fi, err := os.Stat(dir)
+	_, err := os.Stat(dir)
 	if os.IsNotExist(err) {
-		// prepare dir
 		if err := os.MkdirAll(dir, mode); err != nil {
 			return err
 		}
-	} else {
-		// if is normal file
-		if force && fi.Mode().IsRegular() {
-			if err := os.Remove(dir); err != nil {
-				return err
-			}
-			if err := os.MkdirAll(dir, mode); err != nil {
-				return err
-			}
-		}
 	}
 	return nil
+}
+
+func PrepareDirFor(path string) {
+	e := CreateDirIfNotExist(filepath.Dir(path))
+	if e != nil {
+		panic(e)
+	}
 }
 
 func OpenFile(path string) (*os.File, error) {
@@ -71,6 +68,10 @@ func OpenFile(path string) (*os.File, error) {
 		}
 	}
 	return os.Create(path)
+}
+
+func OpenFileForAppend(path string) (*os.File, error) {
+	return os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 }
 
 func ReadFile(path string) []byte {
@@ -89,4 +90,27 @@ func WriteFile(path string, content []byte) {
 	if e := ioutil.WriteFile(path, content, 0644); e != nil {
 		log.Fatal(e)
 	}
+}
+
+func AppendFile(path string, line string) error {
+	PrepareDirFor(path)
+	f, e := OpenFileForAppend(path)
+	defer f.Close()
+	if e != nil {
+		return e
+	}
+
+	if !strings.HasSuffix(line, "\n") {
+		line += "\n"
+	}
+	_, e = f.WriteString(line)
+	return e
+}
+
+func ItemsTrimed(str string, sep string) []string {
+	xs := []string{}
+	for _, x := range strings.Split(str, sep) {
+		xs = append(xs, strings.TrimSpace(x))
+	}
+	return xs
 }
