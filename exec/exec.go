@@ -11,7 +11,9 @@ import (
 func ExecGetOutput(command string, cmdChan chan<- *exec.Cmd, logfile string) (string, error) {
 	cmd := exec.Command("bash", []string{"-c", command}...)
 
-	var r_tee io.Reader
+	var rTee io.Reader
+	var r *io.PipeReader
+	var w *io.PipeWriter
 	if logfile != "" {
 		// PrepareDirFor(logfile)
 		log, e := fs.OpenFileForAppend(logfile)
@@ -19,8 +21,8 @@ func ExecGetOutput(command string, cmdChan chan<- *exec.Cmd, logfile string) (st
 			return "", e
 		}
 
-		r, w := io.Pipe()
-		r_tee = io.TeeReader(r, log)
+		r, w = io.Pipe()
+		rTee = io.TeeReader(r, log)
 		cmd.Stdout = w
 		cmd.Stderr = w
 	}
@@ -31,38 +33,34 @@ func ExecGetOutput(command string, cmdChan chan<- *exec.Cmd, logfile string) (st
 	}
 
 	if logfile != "" {
-		errChan := make(chan error, 1)
-		// run in another goroutine
-		go func() {
-			e := cmd.Run()
-			errChan <- e
-		}()
-
-		r := r_tee
-
 		// copy from ioutil.ReadAll
 		ReadAll := func() ([]byte, error) {
-			step := 512
-			// step := 64
+			// step := 512
+			step := 64 // small step get more instant response in `tail -f`
 			b := make([]byte, 0, step)
-			for {
-				select {
-				case resultErr := <-errChan:
-					return b, resultErr
-				default:
+			doneChan := make(chan bool, 1)
+			go func() {
+				defer func() { doneChan <- true }()
+				for {
 					if len(b) == cap(b) {
 						b = append(b, 0)[:len(b)]
 					}
-					n, err := r.Read(b[len(b):minInt(len(b)+step, cap(b))])
+
+					n, err := rTee.Read(b[len(b):minInt(len(b)+step, cap(b))])
 					b = b[:len(b)+n]
 					if err != nil {
 						if err == io.EOF {
 							err = nil
 						}
-						return b, err
+						return
 					}
 				}
-			}
+			}()
+
+			e := cmd.Run()
+			w.Close()
+			<-doneChan
+			return b, e
 		}
 
 		bs, e := ReadAll()
@@ -73,17 +71,18 @@ func ExecGetOutput(command string, cmdChan chan<- *exec.Cmd, logfile string) (st
 	}
 }
 
-func Exec(command string) {
+func Exec(command string) (string, error) {
 	cmd := exec.Command("bash", []string{"-c", command}...)
 	stdoutStderr, err := cmd.CombinedOutput()
-	HandlerResult(command, string(stdoutStderr), err)
+	out := string(stdoutStderr)
+	return out, err
 }
 
-func HandlerResult(command string, output string, err error) {
+func HandlerResult(command string, err error) {
 	if err != nil {
-		log.Printf("execute command `%v` error: %v", command, err)
+		log.Printf("WARN: command `%v` error: %v", command, err)
 	}
-	log.Printf("execute command `%v` output: %v", command, string(output))
+	log.Printf("OK: command `%v` succeed", command)
 }
 
 func minInt(a, b int) int {
