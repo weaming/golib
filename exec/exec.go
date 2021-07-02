@@ -81,8 +81,9 @@ func Exec(command string) (string, error) {
 func HandlerResult(command string, err error) {
 	if err != nil {
 		log.Printf("WARN: command `%v` error: %v", command, err)
+	} else {
+		log.Printf("OK: command `%v` succeed", command)
 	}
-	log.Printf("OK: command `%v` succeed", command)
 }
 
 func minInt(a, b int) int {
