@@ -30,10 +30,8 @@ func fileMode(path string) string {
 	}
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
-		// do directory stuff
 		return "directory"
 	case mode.IsRegular():
-		// do file stuff
 		return "file"
 	default:
 		return ""
