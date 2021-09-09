@@ -9,9 +9,23 @@ import (
 	"strings"
 )
 
+// exist, permmission allowed -> true
+// exist, permmission denied -> panic, because can't confirm exist or not
+// not exist -> false
 func Exist(path string) bool {
 	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
+	// https://stefanxo.com/go-anti-patterns-os-isexisterr-os-isnotexisterr/
+	// os.IsExist(err) does NOT work, because Stat will never return this error;
+	// os.IsExist(err) is good for cases when you expect the file to not exist yet,
+	// but the file actually exists, such as os.Symlink
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		} else {
+			panic(err)
+		}
+	}
+	return true
 }
 
 func IsFile(path string) bool {
