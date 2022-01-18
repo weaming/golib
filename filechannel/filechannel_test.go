@@ -8,7 +8,7 @@ import (
 )
 
 func TestFileChannel(t *testing.T) {
-	fc := NewFileChan("./set", 100)
+	fc := NewFileChan("./set", 100, true)
 	fs.AppendFile("./set", "a")
 	fs.AppendFile("./set", "b")
 

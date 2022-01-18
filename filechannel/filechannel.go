@@ -18,7 +18,7 @@ type FileChan struct {
 
 // 0 size will not create channel
 func NewFileChan(path string, size int, allowSame bool) *FileChan {
-	fc := &FileChan{}
+	fc := &FileChan{allowSame: allowSame}
 	if size > 0 {
 		fc.ch = make(chan string, size)
 	} else {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"strconv"
@@ -104,6 +105,8 @@ func Download(url string, N int) ([]byte, error) {
 	if e != nil {
 		return nil, e
 	}
+
+	log.Printf("size of url %v: %v", url, size)
 	if size == 0 {
 		return HTTPGetByRange(nil, url, 0, 0)
 	}
