@@ -9,4 +9,5 @@ require (
 	github.com/influxdata/influxdb v1.8.2
 	github.com/shirou/gopsutil v2.20.8+incompatible
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
