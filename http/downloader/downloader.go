@@ -147,7 +147,7 @@ func Download(url string, N int) ([]byte, error) {
 	if e != nil {
 		return nil, e
 	}
-	fmt.Printf("Total size is %v\n", size)
+	fmt.Printf("Total size is %v=%v\n", size, fs.HumanSize(size))
 
 	updates := make(chan int)
 	defer close(updates)
