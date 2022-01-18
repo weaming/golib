@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func HumanSize(size int64) string {
+func HumanSize(size uint64) string {
 	const ratio = 1024
 	size_float := float64(size)
 	units := []string{"B", "KB", "MB", "GB", "TB", "EB"}
@@ -14,19 +14,19 @@ func HumanSize(size int64) string {
 	for ; size_float > ratio; index += 1 {
 		size_float /= ratio
 	}
-	return fmt.Sprintf("%.2f %s", size_float, units[index])
+	return fmt.Sprintf("%.2f%s", size_float, units[index])
 }
 
-func FileSize(path string) int64 {
+func FileSize(path string) uint64 {
 	fileInfo, err := os.Lstat(path)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		panic(err)
 	}
-	return fileInfo.Size()
+	return uint64(fileInfo.Size())
 }
 
-func FilesSize(files []string) (total int64) {
+func FilesSize(files []string) (total uint64) {
 	for _, path := range files {
 		total += FileSize(path)
 	}

@@ -71,7 +71,7 @@ func ContainsPhoto(path string) bool {
 	return false
 }
 
-func DirFilesSize(dirs []string) (total int64) {
+func DirFilesSize(dirs []string) (total uint64) {
 	for _, path := range dirs {
 		tmp := NewDir(path)
 		total = total + FilesSize(tmp.AbsImages) + DirFilesSize(tmp.AbsDirs)
