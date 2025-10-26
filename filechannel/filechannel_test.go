@@ -2,15 +2,20 @@ package filechannel
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/weaming/golib/fs"
 )
 
 func TestFileChannel(t *testing.T) {
-	fc := NewFileChan("./set", 100, true)
-	fs.AppendFile("./set", "a")
-	fs.AppendFile("./set", "b")
+	testFile := "./set"
+	os.Remove(testFile)
+	defer os.Remove(testFile)
+
+	fc := NewFileChan(testFile, 100, true)
+	fs.AppendFile(testFile, "a")
+	fs.AppendFile(testFile, "b")
 
 	fc.In("a")
 	fc.In("b")
@@ -25,7 +30,7 @@ func TestFileChannel(t *testing.T) {
 	fmt.Println(fc.Out())
 	fmt.Println(fc.Out())
 	fmt.Println("-----------")
-	if string(fs.ReadFile("./set")) != `b
+	if string(fs.ReadFile(testFile)) != `b
 a
 b
 c

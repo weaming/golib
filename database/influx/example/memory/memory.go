@@ -5,8 +5,8 @@ import (
 	"time"
 
 	influx "github.com/influxdata/influxdb/client/v2"
-	"github.com/shirou/gopsutil/host"
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v4/host"
+	"github.com/shirou/gopsutil/v4/mem"
 	libinflux "github.com/weaming/golib/database/influx"
 )
 

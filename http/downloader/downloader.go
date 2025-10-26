@@ -121,8 +121,8 @@ func HTTPGetByParts(url string, size uint64, N int, updates chan<- int) ([]byte,
 	}
 
 	data := []byte{}
-	for _, bs := range parts {
-		data = append(data, bs.Content...)
+	for i := range parts {
+		data = append(data, parts[i].Content...)
 	}
 	return data, nil
 }

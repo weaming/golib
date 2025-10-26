@@ -1,11 +1,12 @@
 package filechannel
 
 import (
-	"fmt"
+	"bufio"
 	"log"
+	"os"
+	"strings"
 	"sync"
 
-	"github.com/weaming/golib/exec"
 	"github.com/weaming/golib/fs"
 )
 
@@ -36,15 +37,29 @@ func (r *FileChan) In(x string) {
 	}
 	e := fs.AppendFile(r.File, x)
 	if e != nil {
-		log.Println(`write file "%v" err: %v`, r.File, e)
+		log.Printf(`write file "%v" err: %v`, r.File, e)
 	}
 }
 
 func (r *FileChan) Has(x string) bool {
 	r.Lock()
 	defer r.Unlock()
-	_, e := exec.ExecGetOutput(fmt.Sprintf("cat %v | grep -E '^%v$'", r.File, x), nil, "")
-	return e == nil
+
+	file, e := os.Open(r.File)
+	if e != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == x {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *FileChan) Out() string {
@@ -56,11 +71,45 @@ func (r *FileChan) Out() string {
 func (r *FileChan) OutByValue(x string) {
 	r.Lock()
 	defer r.Unlock()
-	if r.allowSame {
-		// 移除第一个匹配的行
-		exec.Exec(fmt.Sprintf("sed '0,/^%v$/{//d}' %v -i", x, r.File))
-	} else {
-		// 移除匹配的所有行
-		exec.Exec(fmt.Sprintf("sed '/^%v$/d' %v -i", x, r.File))
+
+	file, e := os.Open(r.File)
+	if e != nil {
+		log.Printf(`read file "%v" err: %v`, r.File, e)
+		return
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	foundFirst := false
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == x {
+			if r.allowSame {
+				if !foundFirst {
+					foundFirst = true
+					continue
+				}
+			} else {
+				continue
+			}
+		}
+		lines = append(lines, line)
+	}
+	file.Close()
+
+	if e := scanner.Err(); e != nil {
+		log.Printf(`scan file "%v" err: %v`, r.File, e)
+		return
+	}
+
+	content := strings.Join(lines, "\n")
+	if len(lines) > 0 {
+		content += "\n"
+	}
+
+	e = os.WriteFile(r.File, []byte(content), 0644)
+	if e != nil {
+		log.Printf(`write file "%v" err: %v`, r.File, e)
 	}
 }
